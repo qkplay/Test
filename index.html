@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MK Yamaha Audio Player</title>
+
+<style>
+:root{
+  --bg:#07080c;
+  --body:#1b202a;
+  --body2:#11151d;
+  --screen:#00180f;
+  --screen2:#062619;
+  --green:#00ffae;
+  --green2:#00c987;
+  --gold:#f5c542;
+  --orange:#ff9c22;
+  --blue:#34bfff;
+  --red:#d03a32;
+  --text:#f3f6ff;
+  --muted:#9aa3b5;
+  --line:#333b4c;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:radial-gradient(circle at top,#232733 0,#08090d 50%,#000 100%);
+  color:var(--text);
+  font-family:Tahoma,Arial,sans-serif;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:16px;
+}
+
+.receiver{
+  width:100%;
+  max-width:980px;
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(180deg,#252a36,#12161f 70%,#0b0e14);
+  background-size:8px 8px,100% 100%;
+  border:1px solid #3d4659;
+  border-radius:26px;
+  padding:18px;
+  box-shadow:
+    0 35px 90px rgba(0,0,0,.75),
+    inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  direction:ltr;
+  margin-bottom:14px;
+}
+
+.brand{
+  letter-spacing:6px;
+  color:#c0c8d8;
+  font-weight:bold;
+  font-size:15px;
+}
+
+.brand small{
+  display:block;
+  letter-spacing:3px;
+  color:#727b8e;
+  margin-top:4px;
+  font-size:10px;
+}
+
+.mk{
+  color:var(--gold);
+  font-size:28px;
+  font-weight:900;
+  letter-spacing:3px;
+  text-shadow:0 0 18px rgba(245,197,66,.45);
+}
+
+.power{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:#aeb6c8;
+  font-size:12px;
+}
+
+.led{
+  width:11px;
+  height:11px;
+  border-radius:50%;
+  background:var(--orange);
+  box-shadow:0 0 16px var(--orange);
+}
+
+.screen{
+  background:
+    linear-gradient(rgba(0,255,174,.035) 50%,rgba(0,0,0,.08) 50%),
+    radial-gradient(circle at top,#082f20 0,#00180f 60%,#000805 100%);
+  background-size:100% 6px,100% 100%;
+  border:1px solid rgba(0,255,174,.34);
+  border-radius:18px;
+  padding:15px;
+  box-shadow:
+    inset 0 0 32px rgba(0,255,174,.13),
+    0 0 18px rgba(0,255,174,.07);
+}
+
+.screenHead{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  border:1px solid rgba(0,255,174,.18);
+  border-radius:12px;
+  padding:10px 12px;
+  color:var(--green);
+  direction:ltr;
+  font-family:Consolas,monospace;
+  font-size:13px;
+  margin-bottom:12px;
+}
+
+.screenGrid{
+  display:grid;
+  grid-template-columns:1fr 210px;
+  gap:14px;
+  align-items:stretch;
+}
+
+.nowTitle{
+  color:var(--green);
+  font-size:30px;
+  font-weight:900;
+  line-height:1.35;
+  text-align:right;
+  text-shadow:0 0 14px rgba(0,255,174,.45);
+  min-height:82px;
+}
+
+.nowSub{
+  color:#d7fff1;
+  text-align:right;
+  font-size:13px;
+  margin-top:6px;
+  min-height:22px;
+}
+
+.vu{
+  height:76px;
+  display:flex;
+  align-items:end;
+  justify-content:center;
+  gap:5px;
+  margin:12px 0 8px;
+  direction:ltr;
+}
+
+.vu span{
+  display:block;
+  width:8px;
+  background:linear-gradient(180deg,var(--green),rgba(0,255,174,.25));
+  border-radius:5px 5px 0 0;
+  box-shadow:0 0 10px rgba(0,255,174,.45);
+  animation:vu 1.1s infinite ease-in-out;
+  opacity:.95;
+}
+
+.vu span:nth-child(2n){animation-delay:.12s}
+.vu span:nth-child(3n){animation-delay:.24s}
+.vu span:nth-child(4n){animation-delay:.36s}
+
+@keyframes vu{
+  0%,100%{height:18px}
+  50%{height:62px}
+}
+
+.timeBox{
+  direction:ltr;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:#dffff5;
+  font-family:Consolas,monospace;
+  font-size:13px;
+}
+
+#seekBar{
+  flex:1;
+  accent-color:var(--green);
+  cursor:pointer;
+}
+
+.infoPanel{
+  border:1px solid rgba(0,255,174,.28);
+  border-radius:12px;
+  padding:12px;
+  color:var(--green);
+  direction:ltr;
+  font-family:Consolas,monospace;
+  font-size:12px;
+}
+
+.infoItem{
+  margin-bottom:10px;
+  border-bottom:1px dotted rgba(0,255,174,.22);
+  padding-bottom:8px;
+}
+
+.infoItem:last-child{
+  border-bottom:0;
+  margin-bottom:0;
+}
+
+.label{
+  color:#66ffc9;
+  opacity:.75;
+}
+
+.value{
+  color:#eafff7;
+  margin-top:3px;
+  word-break:break-word;
+}
+
+.inputRow{
+  margin-top:14px;
+  display:grid;
+  grid-template-columns:1fr 120px;
+  gap:10px;
+  direction:ltr;
+}
+
+input{
+  width:100%;
+  background:#080b11;
+  border:1px solid #3a4355;
+  color:white;
+  border-radius:14px;
+  padding:14px;
+  outline:none;
+}
+
+input:focus{
+  border-color:var(--green);
+  box-shadow:0 0 0 2px rgba(0,255,174,.12);
+}
+
+.loadBtn{
+  border:0;
+  background:linear-gradient(180deg,#00ffc3,#008b66);
+  color:#00140e;
+  border-radius:14px;
+  font-weight:900;
+  font-size:15px;
+}
+
+.playerBox{
+  width:1px;
+  height:1px;
+  opacity:0;
+  overflow:hidden;
+  margin:0 auto;
+  transition:.3s;
+  border-radius:15px;
+  background:#000;
+  border:1px solid rgba(0,255,174,.2);
+}
+
+.playerBox.visible{
+  width:100%;
+  height:260px;
+  opacity:1;
+  margin-top:14px;
+}
+
+.playerBox.big{
+  width:100%;
+  height:460px;
+  opacity:1;
+  margin-top:14px;
+}
+
+#player{
+  width:100%;
+  height:100%;
+}
+
+.controlsPanel{
+  margin-top:18px;
+  display:grid;
+  grid-template-columns:1.2fr 1fr;
+  gap:18px;
+  align-items:stretch;
+}
+
+.bigButtons{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
+button{
+  cursor:pointer;
+  transition:.2s;
+}
+
+button:hover{
+  filter:brightness(1.12);
+  transform:translateY(-1px);
+}
+
+.mainBtn{
+  min-height:70px;
+  border:1px solid #3b4558;
+  border-radius:18px;
+  color:white;
+  background:linear-gradient(180deg,#2b3241,#151a23);
+  box-shadow:0 10px 20px rgba(0,0,0,.35);
+  font-weight:900;
+  font-size:16px;
+}
+
+.play{
+  background:linear-gradient(180deg,#f7d879,#b58a2d);
+  color:#121212;
+  grid-column:span 3;
+  font-size:22px;
+}
+
+.pauseStyle{
+  background:linear-gradient(180deg,#555,#2b2b2b)!important;
+  color:white!important;
+}
+
+.screenBtn{
+  background:linear-gradient(180deg,#2b72ff,#164ab7);
+}
+
+.backBtn,.forwardBtn{
+  background:linear-gradient(180deg,#333a4b,#171c25);
+}
+
+.timerCard{
+  background:linear-gradient(180deg,#191e28,#10141c);
+  border:1px solid #333b4d;
+  border-radius:18px;
+  padding:14px;
+}
+
+.timerTitle{
+  color:var(--orange);
+  font-weight:bold;
+  text-align:center;
+  margin-bottom:10px;
+}
+
+.timerGrid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:10px;
+}
+
+.timerGrid button{
+  border:1px solid #3b4558;
+  border-radius:12px;
+  padding:13px 6px;
+  background:#252b38;
+  color:var(--gold);
+  font-weight:bold;
+}
+
+.timerActions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:10px;
+}
+
+.timerActions button{
+  border:0;
+  border-radius:12px;
+  padding:13px;
+  color:white;
+  font-weight:bold;
+}
+
+.startTimer{
+  background:#c06f18;
+}
+
+.cancelTimer{
+  background:#b7332b;
+}
+
+.statusLine{
+  margin-top:14px;
+  background:#0e1219;
+  border:1px solid #374052;
+  color:var(--orange);
+  text-align:center;
+  padding:11px;
+  border-radius:12px;
+  font-family:Consolas,monospace;
+  font-size:13px;
+  min-height:42px;
+}
+
+.signature{
+  text-align:center;
+  margin-top:13px;
+  color:var(--gold);
+  letter-spacing:2px;
+  font-weight:bold;
+}
+
+@media(max-width:760px){
+  body{
+    align-items:flex-start;
+  }
+
+  .receiver{
+    padding:14px;
+    border-radius:18px;
+  }
+
+  .mk{
+    font-size:24px;
+  }
+
+  .brand{
+    letter-spacing:3px;
+    font-size:12px;
+  }
+
+  .screenGrid{
+    grid-template-columns:1fr;
+  }
+
+  .nowTitle{
+    font-size:24px;
+  }
+
+  .inputRow{
+    grid-template-columns:1fr;
+  }
+
+  .controlsPanel{
+    grid-template-columns:1fr;
+  }
+
+  .bigButtons{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .play{
+    grid-column:span 2;
+  }
+
+  .mainBtn{
+    min-height:62px;
+  }
+
+  .playerBox.visible{
+    height:230px;
+  }
+
+  .playerBox.big{
+    height:390px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="receiver">
+
+  <div class="top">
+    <div class="brand">
+      YAMAHA STYLE
+      <small>MK AUDIO RECEIVER</small>
+    </div>
+
+    <div class="mk">MK</div>
+
+    <div class="power">
+      <div class="led"></div>
+      PWR
+    </div>
+  </div>
+
+  <div class="screen">
+
+    <div class="screenHead">
+      <div>SOURCE: YOUTUBE</div>
+      <div id="screenState">STATUS: READY</div>
+    </div>
+
+    <div class="screenGrid">
+
+      <div>
+        <div class="nowTitle" id="trackTitle">مشغل صوت يوتيوب</div>
+        <div class="nowSub" id="trackSub">الصق الرابط واضغط تشغيل</div>
+
+        <div class="vu" id="vuMeter">
+          <span style="height:22px"></span>
+          <span style="height:38px"></span>
+          <span style="height:55px"></span>
+          <span style="height:26px"></span>
+          <span style="height:43px"></span>
+          <span style="height:31px"></span>
+          <span style="height:60px"></span>
+          <span style="height:36px"></span>
+          <span style="height:24px"></span>
+          <span style="height:48px"></span>
+          <span style="height:28px"></span>
+          <span style="height:40px"></span>
+          <span style="height:58px"></span>
+          <span style="height:30px"></span>
+          <span style="height:44px"></span>
+          <span style="height:23px"></span>
+        </div>
+
+        <div class="timeBox">
+          <span id="currentTime">0:00</span>
+          <input id="seekBar" type="range" min="0" max="100" value="0">
+          <span id="duration">0:00</span>
+        </div>
+      </div>
+
+      <div class="infoPanel">
+        <div class="infoItem">
+          <div class="label">VIDEO ID</div>
+          <div class="value" id="videoIdBox">---</div>
+        </div>
+
+        <div class="infoItem">
+          <div class="label">TITLE</div>
+          <div class="value" id="titleBox">---</div>
+        </div>
+
+        <div class="infoItem">
+          <div class="label">DURATION</div>
+          <div class="value" id="durationBox">0:00</div>
+        </div>
+
+        <div class="infoItem">
+          <div class="label">MODE</div>
+          <div class="value" id="modeBox">Audio Only</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="inputRow">
+      <input id="youtubeUrl" type="text" placeholder="Paste YouTube link here">
+      <button class="loadBtn" onclick="loadOrToggle()">LOAD</button>
+    </div>
+
+    <div id="playerBox" class="playerBox">
+      <div id="player"></div>
+    </div>
+
+  </div>
+
+  <div class="controlsPanel">
+
+    <div class="bigButtons">
+      <button class="mainBtn play" id="playBtn" onclick="loadOrToggle()">▶ PLAY</button>
+      <button class="mainBtn backBtn" onclick="backward10()">⏪ -10s</button>
+      <button class="mainBtn screenBtn" id="screenBtn" onclick="cycleScreenMode()">👁 DISPLAY</button>
+      <button class="mainBtn forwardBtn" onclick="forward10()">+10s ⏩</button>
+    </div>
+
+    <div class="timerCard">
+      <div class="timerTitle">SLEEP TIMER</div>
+
+      <input id="sleepMinutes" type="number" min="1" placeholder="عدد الدقائق">
+
+      <div class="timerGrid">
+        <button onclick="startSleepTimer(10)">10 د</button>
+        <button onclick="startSleepTimer(30)">30 د</button>
+        <button onclick="startSleepTimer(60)">60 د</button>
+      </div>
+
+      <div class="timerActions">
+        <button class="startTimer" onclick="startSleepTimer()">START</button>
+        <button class="cancelTimer" onclick="cancelSleepTimer()">CANCEL</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="statusLine" id="status">READY · ضع الرابط واضغط PLAY</div>
+  <div class="statusLine" id="timerStatus">SLEEP TIMER · OFF</div>
+
+  <div class="signature">Executed by MK</div>
+
+</div>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<script>
+let player;
+let playerReady = false;
+let isLoaded = false;
+let isPlaying = false;
+let screenMode = 0; // 0 hidden, 1 visible, 2 big
+let currentVideoId = "---";
+
+let updateInterval = null;
+let wakeLock = null;
+let sleepTimeout = null;
+let countdownInterval = null;
+let remainingSeconds = 0;
+
+function onYouTubeIframeAPIReady(){
+  player = new YT.Player("player", {
+    height:"100%",
+    width:"100%",
+    videoId:"",
+    playerVars:{
+      autoplay:0,
+      controls:1,
+      rel:0,
+      modestbranding:1,
+      playsinline:1,
+      fs:1
+    },
+    events:{
+      onReady:function(){
+        playerReady = true;
+        setStatus("READY · المشغل جاهز");
+      },
+      onStateChange:onPlayerStateChange
+    }
+  });
+}
+
+function getVideoId(url){
+  try{
+    let u = new URL(url);
+
+    if(u.hostname.includes("youtu.be")){
+      return u.pathname.slice(1).split("?")[0];
+    }
+
+    if(u.searchParams.get("v")){
+      return u.searchParams.get("v");
+    }
+
+    if(u.pathname.includes("/shorts/")){
+      return u.pathname.split("/shorts/")[1].split("/")[0];
+    }
+
+    if(u.pathname.includes("/embed/")){
+      return u.pathname.split("/embed/")[1].split("/")[0];
+    }
+
+    return null;
+  }catch(e){
+    return null;
+  }
+}
+
+async function keepScreenOn(){
+  try{
+    if("wakeLock" in navigator){
+      wakeLock = await navigator.wakeLock.request("screen");
+    }
+  }catch(err){
+    console.log(err);
+  }
+}
+
+function loadOrToggle(){
+  if(!playerReady){
+    alert("المشغل لم يجهز بعد، انتظر ثانية وجرب");
+    return;
+  }
+
+  if(!isLoaded){
+    const url = document.getElementById("youtubeUrl").value.trim();
+    const id = getVideoId(url);
+
+    if(!id){
+      alert("الرابط غير صحيح");
+      return;
+    }
+
+    currentVideoId = id;
+    document.getElementById("videoIdBox").innerText = id;
+
+    keepScreenOn();
+
+    player.loadVideoById(id);
+    isLoaded = true;
+    isPlaying = true;
+
+    hidePlayer();
+    updatePlayButton(true);
+    startUpdatingTime();
+
+    setStatus("LOADING · جاري التشغيل");
+    updateScreenState("PLAYING");
+
+    return;
+  }
+
+  if(isPlaying){
+    player.pauseVideo();
+  }else{
+    player.playVideo();
+  }
+}
+
+function updatePlayButton(playing){
+  const btn = document.getElementById("playBtn");
+
+  if(playing){
+    btn.innerHTML = "⏸ PAUSE";
+    btn.classList.add("pauseStyle");
+  }else{
+    btn.innerHTML = "▶ PLAY";
+    btn.classList.remove("pauseStyle");
+  }
+}
+
+function onPlayerStateChange(event){
+  if(event.data === YT.PlayerState.PLAYING){
+    isPlaying = true;
+    updatePlayButton(true);
+    startUpdatingTime();
+    updateScreenState("PLAYING");
+    setStatus("PLAYING · يعمل الآن");
+
+    try{
+      const data = player.getVideoData();
+      if(data && data.title){
+        document.getElementById("trackTitle").innerText = data.title;
+        document.getElementById("titleBox").innerText = data.title;
+        document.getElementById("trackSub").innerText = "YouTube Audio · " + currentVideoId;
+      }
+    }catch(e){}
+  }
+
+  if(event.data === YT.PlayerState.PAUSED){
+    isPlaying = false;
+    updatePlayButton(false);
+    updateScreenState("PAUSED");
+    setStatus("PAUSED · توقف مؤقت");
+  }
+
+  if(event.data === YT.PlayerState.ENDED){
+    isPlaying = false;
+    updatePlayButton(false);
+    updateScreenState("ENDED");
+    setStatus("ENDED · انتهى التشغيل");
+  }
+
+  if(event.data === YT.PlayerState.BUFFERING){
+    updateScreenState("BUFFERING");
+    setStatus("BUFFERING · جاري التحميل");
+  }
+}
+
+function backward10(){
+  if(!playerReady || !isLoaded) return;
+  const t = player.getCurrentTime() || 0;
+  player.seekTo(Math.max(0, t - 10), true);
+}
+
+function forward10(){
+  if(!playerReady || !isLoaded) return;
+  const t = player.getCurrentTime() || 0;
+  player.seekTo(t + 10, true);
+}
+
+function cycleScreenMode(){
+  if(screenMode === 0){
+    showPlayer();
+    screenMode = 1;
+    document.getElementById("screenBtn").innerHTML = "🔍 ZOOM";
+    document.getElementById("modeBox").innerText = "Video Display";
+    setStatus("DISPLAY ON · الشاشة ظاهرة");
+  }else if(screenMode === 1){
+    bigPlayer();
+    screenMode = 2;
+    document.getElementById("screenBtn").innerHTML = "🙈 HIDE";
+    document.getElementById("modeBox").innerText = "Large Video Display";
+    setStatus("ZOOM DISPLAY · الشاشة مكبرة");
+  }else{
+    hidePlayer();
+    screenMode = 0;
+    document.getElementById("screenBtn").innerHTML = "👁 DISPLAY";
+    document.getElementById("modeBox").innerText = "Audio Only";
+    setStatus("AUDIO ONLY · الشاشة مخفية والصوت مستمر");
+  }
+}
+
+function showPlayer(){
+  const box = document.getElementById("playerBox");
+  box.classList.remove("big");
+  box.classList.add("visible");
+}
+
+function bigPlayer(){
+  const box = document.getElementById("playerBox");
+  box.classList.remove("visible");
+  box.classList.add("big");
+}
+
+function hidePlayer(){
+  const box = document.getElementById("playerBox");
+  box.classList.remove("visible");
+  box.classList.remove("big");
+  screenMode = 0;
+  document.getElementById("screenBtn").innerHTML = "👁 DISPLAY";
+  document.getElementById("modeBox").innerText = "Audio Only";
+}
+
+function startUpdatingTime(){
+  clearInterval(updateInterval);
+
+  updateInterval = setInterval(()=>{
+    if(!playerReady || !isLoaded) return;
+
+    let current = 0;
+    let total = 0;
+
+    try{
+      current = player.getCurrentTime() || 0;
+      total = player.getDuration() || 0;
+    }catch(e){
+      return;
+    }
+
+    document.getElementById("currentTime").innerText = formatTime(current);
+    document.getElementById("duration").innerText = formatTime(total);
+    document.getElementById("durationBox").innerText = formatTime(total);
+
+    if(total > 0){
+      document.getElementById("seekBar").value = (current / total) * 100;
+    }
+  },500);
+}
+
+document.getElementById("seekBar").addEventListener("input", function(){
+  if(!playerReady || !isLoaded) return;
+
+  const total = player.getDuration() || 0;
+  const value = Number(this.value);
+
+  if(total > 0){
+    player.seekTo((value / 100) * total, true);
+  }
+});
+
+function formatTime(seconds){
+  seconds = Math.floor(seconds || 0);
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return mins + ":" + secs.toString().padStart(2,"0");
+}
+
+function startSleepTimer(presetMinutes){
+  let minutes = presetMinutes || parseInt(document.getElementById("sleepMinutes").value);
+
+  if(!minutes || minutes <= 0){
+    alert("ضع عدد دقائق صحيح");
+    return;
+  }
+
+  document.getElementById("sleepMinutes").value = minutes;
+
+  cancelSleepTimer(false);
+
+  remainingSeconds = minutes * 60;
+  updateCountdown();
+
+  countdownInterval = setInterval(()=>{
+    remainingSeconds--;
+    updateCountdown();
+
+    if(remainingSeconds <= 0){
+      clearInterval(countdownInterval);
+    }
+  },1000);
+
+  sleepTimeout = setTimeout(()=>{
+    if(playerReady && isLoaded){
+      player.pauseVideo();
+    }
+
+    isPlaying = false;
+    updatePlayButton(false);
+    updateScreenState("SLEEP");
+    setStatus("SLEEP · تم الإيقاف بواسطة المؤقت");
+
+    document.getElementById("timerStatus").innerHTML =
+    "SLEEP TIMER · FINISHED";
+
+  },minutes * 60 * 1000);
+}
+
+function cancelSleepTimer(showMessage = true){
+  clearTimeout(sleepTimeout);
+  clearInterval(countdownInterval);
+  remainingSeconds = 0;
+
+  if(showMessage){
+    document.getElementById("timerStatus").innerHTML =
+    "SLEEP TIMER · CANCELLED";
+  }
+}
+
+function updateCountdown(){
+  const mins = Math.floor(remainingSeconds / 60);
+  const secs = remainingSeconds % 60;
+
+  document.getElementById("timerStatus").innerHTML =
+  `SLEEP TIMER · ${mins}:${secs.toString().padStart(2,"0")}`;
+}
+
+function updateScreenState(text){
+  document.getElementById("screenState").innerText = "STATUS: " + text;
+}
+
+function setStatus(text){
+  document.getElementById("status").innerText = text;
+}
+</script>
+
+</body>
+</html>
